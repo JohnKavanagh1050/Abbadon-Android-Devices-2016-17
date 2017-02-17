@@ -15,6 +15,7 @@
 
 class Player;
 class Boss;
+class Willpower;
 
 class GameScene : public cocos2d::Layer
 {
@@ -23,6 +24,7 @@ private:
 
 	Player* player;
 	Boss* boss;
+	Willpower* willpower;
 	//MeteorFactory* meteorFactory;
 
 	cocos2d::CCSprite* bk1;
@@ -56,3 +58,4 @@ public:
 
 #include "Player.h"
 #include "Boss.h"
+#include "Willpower.h"

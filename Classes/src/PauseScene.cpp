@@ -20,7 +20,7 @@ Scene* PauseMenu::createScene()
 // on "init" you need to initialize your instance
 bool PauseMenu::init()
 {
-	if (!LayerColor::initWithColor(Color4B(255, 140, 0, 255)))
+	if (!LayerColor::initWithColor(Color4B(220, 220, 220, 255)))
 	{
 		return false;
 	}

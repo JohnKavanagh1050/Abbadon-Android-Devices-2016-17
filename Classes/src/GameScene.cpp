@@ -33,10 +33,7 @@ bool GameScene::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
 
-	pauseItem->setPosition(Point(pauseItem->getContentSize().width -
-		(pauseItem->getContentSize().width / 10) + origin.x,
-		visibleSize.height - pauseItem->getContentSize().height + 
-		(pauseItem->getContentSize().width / 10) + origin.y));
+	pauseItem->setPosition(Vec2(850, s.height - 50));
 
 	auto menu = Menu::create(pauseItem, NULL);
 	menu->setPosition(Point::ZERO);
@@ -52,6 +49,10 @@ bool GameScene::init()
 //	bk2->setPosition(ccp(-bk1->boundingBox().size.width + 1, 0));
 
 	//this->addChild(bk1, 0);
+
+	willpower = Willpower::create();
+	willpower->setPosition(Vec2(50, s.height - 50));
+	this->addChild(willpower, 5);
 
 	player = Player::create();
 	player->setPosition(Vec2(750, 100));
