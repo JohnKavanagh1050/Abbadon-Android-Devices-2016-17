@@ -77,26 +77,12 @@ void GameScene::addBackGroundSprite(cocos2d::Size const & visibleSize, cocos2d::
 {
 	std::shared_ptr<GameData> ptr = GameData::sharedGameData();
 
-
 	auto backgroundSprite = Sprite::create
 		(ptr->m_backgroundTextureFile);
 	backgroundSprite->setPosition(Point((visibleSize.width / 2) +
 		origin.x, (visibleSize.height / 2) + origin.y));
 	this->addChild(backgroundSprite, -1);
 }
-
-/*void GameScene::scrollBk()
-{
-bk1->setPosition(ccp(bk1->getPosition().x + 1, bk1->getPosition().y));
-bk2->setPosition(ccp(bk2->getPosition().x + 1, bk2->getPosition().y));
-
-if (bk1->getPosition().x > bk1->boundingBox().size.width){
-bk1->setPosition(ccp(bk2->getPosition().x - bk2->boundingBox().size.width, bk1->getPosition().y));
-}
-if (bk2->getPosition().x > bk2->boundingBox().size.width){
-bk2->setPosition(ccp(bk1->getPosition().x - bk1->boundingBox().size.width, bk2->getPosition().y));
-}
-}*/
 
 void GameScene::update(float dt)
 {
@@ -139,7 +125,7 @@ void GameScene::update(float dt)
 					float offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
 					float offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
 
-					if (abs(offsetX) > abs(offsetY))
+					if (abs(offsetX) < abs(offsetY))
 					{
 						player->setPositionY(getPositionY() + offsetY);
 					}
