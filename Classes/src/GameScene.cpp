@@ -40,22 +40,24 @@ bool GameScene::init()
 	this->addChild(menu, 6);
 
 	//scrolling background
-//	bk1 = CCSprite::create("GameScreen/menuTemp.png");
+	//	bk1 = CCSprite::create("GameScreen/menuTemp.png");
 	//bk1->setAnchorPoint(ccp(0, 0));
-//	bk1->setPosition(ccp(0, 0));
+	//	bk1->setPosition(ccp(0, 0));
 
-//	bk2 = CCSprite::create("GameScreen/Background.png");
+	//	bk2 = CCSprite::create("GameScreen/Background.png");
 	//bk2->setAnchorPoint(ccp(0, 0));
-//	bk2->setPosition(ccp(-bk1->boundingBox().size.width + 1, 0));
+	//	bk2->setPosition(ccp(-bk1->boundingBox().size.width + 1, 0));
 
 	//this->addChild(bk1, 0);
+
+	collisionManager = std::make_shared<CollisionManager>(CollisionManager());
 
 	willpower = Willpower::create();
 	willpower->setPosition(Vec2(50, s.height - 50));
 	this->addChild(willpower, 5);
 
 	player = Player::create();
-	player->setPosition(Vec2(750, 100));
+	player->setPosition(Vec2(200, 200));
 	this->addChild(player, 5);
 
 	boss = Boss::create();
@@ -84,15 +86,15 @@ void GameScene::addBackGroundSprite(cocos2d::Size const & visibleSize, cocos2d::
 
 /*void GameScene::scrollBk()
 {
-	bk1->setPosition(ccp(bk1->getPosition().x + 1, bk1->getPosition().y));
-	bk2->setPosition(ccp(bk2->getPosition().x + 1, bk2->getPosition().y));
+bk1->setPosition(ccp(bk1->getPosition().x + 1, bk1->getPosition().y));
+bk2->setPosition(ccp(bk2->getPosition().x + 1, bk2->getPosition().y));
 
-	if (bk1->getPosition().x > bk1->boundingBox().size.width){
-		bk1->setPosition(ccp(bk2->getPosition().x - bk2->boundingBox().size.width, bk1->getPosition().y));
-	}
-	if (bk2->getPosition().x > bk2->boundingBox().size.width){
-		bk2->setPosition(ccp(bk1->getPosition().x - bk1->boundingBox().size.width, bk2->getPosition().y));
-	}
+if (bk1->getPosition().x > bk1->boundingBox().size.width){
+bk1->setPosition(ccp(bk2->getPosition().x - bk2->boundingBox().size.width, bk1->getPosition().y));
+}
+if (bk2->getPosition().x > bk2->boundingBox().size.width){
+bk2->setPosition(ccp(bk1->getPosition().x - bk1->boundingBox().size.width, bk2->getPosition().y));
+}
 }*/
 
 void GameScene::update(float dt)
@@ -100,7 +102,7 @@ void GameScene::update(float dt)
 	player->update(this);
 	boss->update(this);
 
-	//get location of my touch event for player movement
+	//allows the enemy reaper to follow the player
 	float x = player->getPosition().x - boss->getPosition().x;
 	float y = player->getPosition().y - boss->getPosition().y;
 	float magnitude = sqrtf(powf(x, 2) + powf(y, 2));
@@ -108,6 +110,49 @@ void GameScene::update(float dt)
 	y /= magnitude;
 
 	boss->move(x, y);
+
+	switch (m_gameState)
+	{
+	case GameStates::GameInit:
+		map.initialise(10, 10, currentLevel);
+
+		for (int i = 0; i < map.tiles.size(); i++)
+		{
+			this->addChild(map.tiles.at(i)->m_CustomTileSprite);
+		}
+
+		for (int i = 0; i < map.tiles.size(); i++)
+		{
+			map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
+		}
+		m_gameState = GameStates::GameDay;
+		break;
+	case GameStates::GameDay:
+		for (int i = 0; i < map.tiles.size(); i++)
+		{
+			switch (map.tiles.at(i)->tileType)
+			{
+			case CustomTile::WALL:
+				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+				{
+					float offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+					float offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+
+					if (abs(offsetX) > abs(offsetY))
+					{
+						player->setPositionY(getPositionY() + offsetY);
+					}
+					else
+					{
+						player->setPositionX(getPositionX() + offsetX);
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event)

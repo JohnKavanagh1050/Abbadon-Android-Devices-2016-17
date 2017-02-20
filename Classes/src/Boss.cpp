@@ -21,11 +21,7 @@ Boss * Boss::create()
 		auto animate = CCAnimate::create(animation);
 		//make body for collisions
 		cocos2d::Size size(69, 60);
-		auto bossBody = PhysicsBody::createBox(size);
-		bossBody->setCollisionBitmask(0x000001);
-		bossBody->setContactTestBitmask(true);
-		bossBody->setTag(10);
-		boss->setPhysicsBody(bossBody);
+
 		boss->runAction(animate);
 		boss->initBullet();
 		boss->setTag(10);

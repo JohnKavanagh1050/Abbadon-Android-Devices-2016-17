@@ -5,13 +5,14 @@
 #include "GameOverScene.h"
 #include "GameData.h"
 #include "GameStates.h"
-#include "TowerBase.h"
-#include "TowerGun.h"
+#include "CollisionManager.h"
+#include "Grid.h"
 
 #include "SimpleAudioEngine.h"  
 
 #include <string>
 #include <iostream>
+#include <memory>
 
 class Player;
 class Boss;
@@ -20,15 +21,19 @@ class Willpower;
 class GameScene : public cocos2d::Layer
 {
 private:
-	GameStates m_gameState;
-
 	Player* player;
 	Boss* boss;
 	Willpower* willpower;
-	//MeteorFactory* meteorFactory;
 
 	cocos2d::CCSprite* bk1;
 	cocos2d::CCSprite* bk2;
+
+	std::shared_ptr<CollisionManager> collisionManager;
+
+	int currentLevel = 1;
+	int maxLevels = 5;
+	Grid map;
+	GameStates m_gameState = GameStates::GameInit;
 
 public:
 	cocos2d::PhysicsWorld * sceneWorld;
@@ -42,9 +47,9 @@ public:
 	void activatePauseScene(Ref *pSender);
 	// Called at game over 
 	void activateGameOverScene(Ref *pSender);
-	void createTowerBases();
+	//void createTowerBases();
 	void update(float dt);
-	void scrollBk();
+	//void scrollBk();
 
 	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
 	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);

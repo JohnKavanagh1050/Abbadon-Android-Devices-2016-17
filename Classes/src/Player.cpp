@@ -19,11 +19,6 @@ Player * Player::create()
 		auto animate = CCAnimate::create(animation);
 		//make body for collisions
 		cocos2d::Size size(40, 55);
-		auto playerBody = PhysicsBody::createBox(size);
-		playerBody->setCollisionBitmask(0x000002);
-		playerBody->setContactTestBitmask(true);
-		playerBody->setTag(20);
-		player->setPhysicsBody(playerBody);
 
 		player->runAction(animate);
 		player->initPlayer();
@@ -48,6 +43,16 @@ float Player::getLives(){
 float Player::setLives(){
 	lives = 10;
 	return lives;
+}
+
+bool Player::setMovingFalse() {
+	speed = 0;
+	return speed;
+}
+
+bool Player::setMovingTrue() {
+	speed = 5.f;
+	return speed;
 }
 
 void Player::update(GameScene* world)

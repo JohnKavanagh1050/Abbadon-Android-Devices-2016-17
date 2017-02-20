@@ -18,6 +18,9 @@ public:
 	float getLives();
 	float setLives();
 
+	bool setMovingFalse();
+	bool setMovingTrue();
+
 private:
 	void initPlayer();
 

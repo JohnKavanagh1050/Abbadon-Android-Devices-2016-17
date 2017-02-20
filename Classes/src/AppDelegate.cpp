@@ -11,7 +11,7 @@ typedef struct tagResource
 
 // Landscape config.
 // 800x480 = Normal screen, WVGA 
-static Resource smallResource = { cocos2d::Size(1000, 550), "sd" };
+static Resource smallResource = { cocos2d::Size(1100, 800), "sd" };
 // 1280x800 = Extra large screen, WXGA, medium density screen (160)
 static Resource mediumResource = { cocos2d::Size(1280, 800), "hd" };
 // 1900x1200 = WUXGA, Devices with such as Nexus 7, Nvidia Shield.
@@ -53,7 +53,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 		auto glview = director->getOpenGLView();
 		// Comment out this if statement if testing on an actual device.
 		if (!glview) {
-			glview = GLViewImpl::create("TBD");
+			glview = GLViewImpl::create("Abbadon");
 			glview->setFrameSize(designResolutionSize.width, designResolutionSize.height);      
 			director->setOpenGLView(glview);
 		}
