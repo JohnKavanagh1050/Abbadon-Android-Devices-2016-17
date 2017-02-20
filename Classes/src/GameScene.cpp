@@ -77,6 +77,7 @@ void GameScene::addBackGroundSprite(cocos2d::Size const & visibleSize, cocos2d::
 {
 	std::shared_ptr<GameData> ptr = GameData::sharedGameData();
 
+
 	auto backgroundSprite = Sprite::create
 		(ptr->m_backgroundTextureFile);
 	backgroundSprite->setPosition(Point((visibleSize.width / 2) +
