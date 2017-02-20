@@ -19,11 +19,6 @@ Player * Player::create()
 		auto animate = CCAnimate::create(animation);
 		//make body for collisions
 		cocos2d::Size size(40, 55);
-		auto playerBody = PhysicsBody::createBox(size);
-		playerBody->setCollisionBitmask(0x000002);
-		playerBody->setContactTestBitmask(true);
-		playerBody->setTag(20);
-		player->setPhysicsBody(playerBody);
 
 		player->runAction(animate);
 		player->initPlayer();

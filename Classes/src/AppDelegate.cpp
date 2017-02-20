@@ -53,7 +53,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 		auto glview = director->getOpenGLView();
 		// Comment out this if statement if testing on an actual device.
 		if (!glview) {
-			glview = GLViewImpl::create("TBD");
+			glview = GLViewImpl::create("Abbadon");
 			glview->setFrameSize(designResolutionSize.width, designResolutionSize.height);      
 			director->setOpenGLView(glview);
 		}
