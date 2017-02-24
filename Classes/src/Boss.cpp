@@ -48,7 +48,7 @@ bool Boss::getRemove(){
 }
 
 void Boss::initBullet(){
-	speed = 3.f;
+	speed = 1.f;
 	dirX = dirY = 0;
 }
 

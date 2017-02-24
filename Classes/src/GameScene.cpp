@@ -57,7 +57,7 @@ bool GameScene::init()
 	this->addChild(willpower, 5);
 
 	player = Player::create();
-	player->setPosition(Vec2(200, 200));
+	player->setPosition(Vec2(300, 300));
 	this->addChild(player, 5);
 
 	boss = Boss::create();
@@ -78,7 +78,7 @@ void GameScene::addBackGroundSprite(cocos2d::Size const & visibleSize, cocos2d::
 	std::shared_ptr<GameData> ptr = GameData::sharedGameData();
 
 	auto backgroundSprite = Sprite::create
-		(ptr->m_backgroundTextureFile);
+	(ptr->m_backgroundTextureFile);
 	backgroundSprite->setPosition(Point((visibleSize.width / 2) +
 		origin.x, (visibleSize.height / 2) + origin.y));
 	this->addChild(backgroundSprite, -1);
@@ -101,13 +101,12 @@ void GameScene::update(float dt)
 	switch (m_gameState)
 	{
 	case GameStates::GameInit:
-		map.initialise(10, 10, currentLevel);
+		map.initialise(10, 10, currentLevel++);
 
 		for (int i = 0; i < map.tiles.size(); i++)
 		{
 			this->addChild(map.tiles.at(i)->m_CustomTileSprite);
 		}
-
 		for (int i = 0; i < map.tiles.size(); i++)
 		{
 			map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
@@ -122,17 +121,25 @@ void GameScene::update(float dt)
 			case CustomTile::WALL:
 				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
 				{
-					float offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
-					float offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+					float offsetX = 0;
+					float offsetY = 0;
+					offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+					offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
 
-					if (abs(offsetX) < abs(offsetY))
+					if (abs(offsetX) > abs(offsetY))
 					{
-						player->setPositionY(getPositionY() + offsetY);
+						player->setPositionY(player->getPositionY() + offsetY);
 					}
 					else
 					{
-						player->setPositionX(getPositionX() + offsetX);
+						player->setPositionX(player->getPositionX() + offsetX);
 					}
+				}
+				break;
+			case CustomTile::DOOR:
+				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+				{
+					m_gameState = GameStates::GameInit;
 				}
 				break;
 			default:
@@ -167,8 +174,6 @@ void GameScene::activatePauseScene(Ref *pSender)
 	//auto scene = GameOver::createScene();
 	Director::getInstance()->pushScene(scene);
 	CocosDenshion::SimpleAudioEngine::sharedEngine()->stopBackgroundMusic("GameMusic.wav");
-
-	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("bossHit.wav");
 }
 
 void GameScene::activateGameOverScene(Ref *pSender)

@@ -19,7 +19,7 @@ Player * Player::create()
 		auto animate = CCAnimate::create(animation);
 		//make body for collisions
 		cocos2d::Size size(40, 55);
-
+		//player->setContentSize(size);
 		player->runAction(animate);
 		player->initPlayer();
 		player->setTag(20);
@@ -45,12 +45,12 @@ float Player::setLives(){
 	return lives;
 }
 
-bool Player::setMovingFalse() {
+bool Player::stopSpeed() {
 	speed = 0;
 	return speed;
 }
 
-bool Player::setMovingTrue() {
+bool Player::giveSpeed() {
 	speed = 5.f;
 	return speed;
 }
