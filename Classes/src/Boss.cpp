@@ -21,11 +21,9 @@ Boss * Boss::create()
 		auto animate = CCAnimate::create(animation);
 		//make body for collisions
 		cocos2d::Size size(69, 60);
-
 		boss->runAction(animate);
 		boss->initBullet();
 		boss->setTag(10);
-
 		return boss;
 	}
 	CC_SAFE_DELETE(boss);
@@ -48,7 +46,7 @@ bool Boss::getRemove(){
 }
 
 void Boss::initBullet(){
-	speed = 3.f;
+	speed = 1.f;
 	dirX = dirY = 0;
 }
 

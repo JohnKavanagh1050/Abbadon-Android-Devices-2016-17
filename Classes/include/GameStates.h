@@ -3,10 +3,9 @@
 
 enum class GameStates
 {
-	PlaceGunTower,
 	GameInit,
-	GameRunning
+	GameDay,
+	GameNight
 };
-
 
 #endif

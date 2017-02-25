@@ -18,6 +18,11 @@ public:
 	float getLives();
 	float setLives();
 
+	bool stopSpeed();
+	bool giveSpeed();
+	bool getMoving();
+	bool movingTrue();
+
 private:
 	void initPlayer();
 

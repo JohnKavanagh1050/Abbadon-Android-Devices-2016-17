@@ -7,16 +7,19 @@ CustomTile::CustomTile(cocos2d::Vec2 position, int const size = 16) :
 	bounds.origin.y = position.y;
 	bounds.size.width = size;
 	bounds.size.height = size;
-	m_CustomTileSprite = cocos2d::Sprite::create("GameScreen/tile_Floor.png");
+	m_CustomTileSprite = cocos2d::Sprite::create("GameScreen/grass1.png");
 }
+
 CustomTile::~CustomTile()
 {
 
 }
+
 void CustomTile::update()
 {
 
 }
+
 void CustomTile::setType(CustomTile::CustomTileType newType)
 {
 	switch (newType)

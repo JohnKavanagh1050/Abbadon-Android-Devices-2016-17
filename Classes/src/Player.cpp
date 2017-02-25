@@ -19,10 +19,11 @@ Player * Player::create()
 		auto animate = CCAnimate::create(animation);
 		//make body for collisions
 		cocos2d::Size size(40, 55);
-
+		//player->setContentSize(size);
 		player->runAction(animate);
 		player->initPlayer();
 		player->setTag(20);
+		player->moving = false;
 		return player;
 	}
 	CC_SAFE_DELETE(player);
@@ -43,6 +44,23 @@ float Player::getLives(){
 float Player::setLives(){
 	lives = 10;
 	return lives;
+}
+bool Player::movingTrue(){
+	moving = true;
+	return moving;
+}
+
+bool Player::getMoving(){
+	return moving;
+}
+bool Player::stopSpeed() {
+	speed = 0;
+	return speed;
+}
+
+bool Player::giveSpeed() {
+	speed = 5.f;
+	return speed;
 }
 
 void Player::update(GameScene* world)
@@ -86,6 +104,7 @@ void Player::loseLives(){
 void Player::idle()
 {
 	moving = false;
+	return moving;
 }
 
 void Player::initPlayer(){

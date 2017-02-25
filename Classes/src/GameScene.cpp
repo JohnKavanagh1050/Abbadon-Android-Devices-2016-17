@@ -40,26 +40,28 @@ bool GameScene::init()
 	this->addChild(menu, 6);
 
 	//scrolling background
-//	bk1 = CCSprite::create("GameScreen/menuTemp.png");
+	//	bk1 = CCSprite::create("GameScreen/menuTemp.png");
 	//bk1->setAnchorPoint(ccp(0, 0));
-//	bk1->setPosition(ccp(0, 0));
+	//	bk1->setPosition(ccp(0, 0));
 
-//	bk2 = CCSprite::create("GameScreen/Background.png");
+	//	bk2 = CCSprite::create("GameScreen/Background.png");
 	//bk2->setAnchorPoint(ccp(0, 0));
-//	bk2->setPosition(ccp(-bk1->boundingBox().size.width + 1, 0));
+	//	bk2->setPosition(ccp(-bk1->boundingBox().size.width + 1, 0));
 
 	//this->addChild(bk1, 0);
+
+	collisionManager = std::make_shared<CollisionManager>(CollisionManager());
 
 	willpower = Willpower::create();
 	willpower->setPosition(Vec2(50, s.height - 50));
 	this->addChild(willpower, 5);
 
 	player = Player::create();
-	player->setPosition(Vec2(750, 100));
+	player->setPosition(Vec2(300, 300));
 	this->addChild(player, 5);
 
 	boss = Boss::create();
-	boss->setPosition(Vec2(300, 300));
+	boss->setPosition(Vec2(200, 500));
 	this->addChild(boss, 5);
 
 	this->scheduleUpdate();
@@ -68,6 +70,18 @@ bool GameScene::init()
 	contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
 
+	map.initialise(10, 10, currentLevel);
+	map.ChangeLevel(true);
+	for (int i = 0; i < map.tiles.size(); i++)
+	{
+		this->addChild(map.tiles.at(i)->m_CustomTileSprite);
+	}
+	for (int i = 0; i < map.tiles.size(); i++)
+	{
+		map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
+	}
+	m_gameState = GameStates::GameDay;
+
 	return true;
 }
 
@@ -75,33 +89,19 @@ void GameScene::addBackGroundSprite(cocos2d::Size const & visibleSize, cocos2d::
 {
 	std::shared_ptr<GameData> ptr = GameData::sharedGameData();
 
-
 	auto backgroundSprite = Sprite::create
-		(ptr->m_backgroundTextureFile);
+	(ptr->m_backgroundTextureFile);
 	backgroundSprite->setPosition(Point((visibleSize.width / 2) +
 		origin.x, (visibleSize.height / 2) + origin.y));
 	this->addChild(backgroundSprite, -1);
 }
-
-/*void GameScene::scrollBk()
-{
-	bk1->setPosition(ccp(bk1->getPosition().x + 1, bk1->getPosition().y));
-	bk2->setPosition(ccp(bk2->getPosition().x + 1, bk2->getPosition().y));
-
-	if (bk1->getPosition().x > bk1->boundingBox().size.width){
-		bk1->setPosition(ccp(bk2->getPosition().x - bk2->boundingBox().size.width, bk1->getPosition().y));
-	}
-	if (bk2->getPosition().x > bk2->boundingBox().size.width){
-		bk2->setPosition(ccp(bk1->getPosition().x - bk1->boundingBox().size.width, bk2->getPosition().y));
-	}
-}*/
 
 void GameScene::update(float dt)
 {
 	player->update(this);
 	boss->update(this);
 
-	//get location of my touch event for player movement
+	//allows the enemy reaper to follow the player
 	float x = player->getPosition().x - boss->getPosition().x;
 	float y = player->getPosition().y - boss->getPosition().y;
 	float magnitude = sqrtf(powf(x, 2) + powf(y, 2));
@@ -109,6 +109,75 @@ void GameScene::update(float dt)
 	y /= magnitude;
 
 	boss->move(x, y);
+
+	if (player->getMoving() == false )
+	{
+		if (map.isDayTime != false)
+		{
+			map.ChangeLevel(true);
+		}
+		
+	}
+	else
+	{
+		if (map.isDayTime == false)
+		{
+			map.ChangeLevel(false);
+		
+		}
+	}
+	
+	switch (m_gameState)
+	{
+		
+	case GameStates::GameDay:
+		//map.ChangeLevel(true);
+		for (int i = 0; i < map.tiles.size(); i++)
+		{
+			switch (map.tiles.at(i)->tileType)
+			{
+			case CustomTile::WALL:
+				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+				{
+					float offsetX = 0;
+					float offsetY = 0;
+					offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+					offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+
+					if (abs(offsetX) > abs(offsetY))
+					{
+						player->setPositionY(player->getPositionY() + offsetY);
+					}
+					else
+					{
+						player->setPositionX(player->getPositionX() + offsetX);
+					}
+				}
+				break;
+			case CustomTile::DOOR:
+				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+				{
+					map.initialise(10, 10, currentLevel++);
+					for (int i = 0; i < map.tiles.size(); i++)
+					{
+						this->addChild(map.tiles.at(i)->m_CustomTileSprite);
+					}
+					for (int i = 0; i < map.tiles.size(); i++)
+					{
+						map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
+					}
+					if (currentLevel > 5)
+					{
+						activateGameOverScene(this);
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}	
+	}
+
 }
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event)
@@ -121,6 +190,7 @@ bool GameScene::onTouchBegan(Touch *touch, Event *event)
 	y /= magnitude;
 
 	player->move(x, y);
+	player->movingTrue();
 
 	return true;
 }
@@ -136,8 +206,6 @@ void GameScene::activatePauseScene(Ref *pSender)
 	//auto scene = GameOver::createScene();
 	Director::getInstance()->pushScene(scene);
 	CocosDenshion::SimpleAudioEngine::sharedEngine()->stopBackgroundMusic("GameMusic.wav");
-
-	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("bossHit.wav");
 }
 
 void GameScene::activateGameOverScene(Ref *pSender)
