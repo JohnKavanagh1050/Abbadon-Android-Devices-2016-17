@@ -5,7 +5,7 @@
 #include "GameScene.h"
 #include "MainMenuScene.h"
 
-class GameOver : public cocos2d::Layer
+class GameOver : public cocos2d::LayerColor
 {
 public:
     static cocos2d::Scene* createScene();

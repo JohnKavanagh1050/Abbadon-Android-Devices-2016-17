@@ -109,75 +109,114 @@ void GameScene::update(float dt)
 	y /= magnitude;
 
 	boss->move(x, y);
+	//collision between boss and player
+	if (collisionManager->checkCollision(player->getBoundingBox(), boss->getBoundingBox()))
+	{
+		activateGameOverScene(this);
+	}
 
-	if (player->getMoving() == false )
+	if (player->getMoving() == false)
 	{
 		if (map.isDayTime != false)
 		{
 			map.ChangeLevel(true);
 		}
-		
 	}
 	else
 	{
 		if (map.isDayTime == false)
 		{
 			map.ChangeLevel(false);
-		
 		}
 	}
-	
-	switch (m_gameState)
+	for (int i = 0; i < map.tiles.size(); i++)
 	{
-		
-	case GameStates::GameDay:
-		//map.ChangeLevel(true);
-		for (int i = 0; i < map.tiles.size(); i++)
+		switch (map.tiles.at(i)->tileType)
 		{
-			switch (map.tiles.at(i)->tileType)
+		case CustomTile::WALL:
+			if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
 			{
-			case CustomTile::WALL:
-				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
-				{
-					float offsetX = 0;
-					float offsetY = 0;
-					offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
-					offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+				float offsetX = 0;
+				float offsetY = 0;
+				offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+				offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
 
-					if (abs(offsetX) > abs(offsetY))
-					{
-						player->setPositionY(player->getPositionY() + offsetY);
-					}
-					else
-					{
-						player->setPositionX(player->getPositionX() + offsetX);
-					}
-				}
-				break;
-			case CustomTile::DOOR:
-				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+				if (abs(offsetX) > abs(offsetY))
 				{
-					map.initialise(10, 10, currentLevel++);
-					for (int i = 0; i < map.tiles.size(); i++)
-					{
-						this->addChild(map.tiles.at(i)->m_CustomTileSprite);
-					}
-					for (int i = 0; i < map.tiles.size(); i++)
-					{
-						map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
-					}
-					if (currentLevel > 5)
-					{
-						activateGameOverScene(this);
-					}
+					player->setPositionY(player->getPositionY() + offsetY);
 				}
-				break;
-			default:
-				break;
+				else
+				{
+					player->setPositionX(player->getPositionX() + offsetX);
+				}
 			}
-		}	
+			break;
+		case CustomTile::DOOR:
+			if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+			{
+				map.initialise(10, 10, currentLevel++);
+				for (int i = 0; i < map.tiles.size(); i++)
+				{
+					this->addChild(map.tiles.at(i)->m_CustomTileSprite);
+				}
+				for (int i = 0; i < map.tiles.size(); i++)
+				{
+					map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
+				}
+				if (currentLevel > 5)
+				{
+					activateGameOverScene(this);
+				}
+			}
+			break;
+		default:
+			break;
+		}
 	}
+	for (int i = 0; i < map.tiles.size(); i++)
+	{
+		switch (map.tiles.at(i)->tileType)
+		{
+		case CustomTile::WALLNIGHT:
+			if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+			{
+				float offsetX = 0;
+				float offsetY = 0;
+				offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+				offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
 
+				if (abs(offsetX) > abs(offsetY))
+				{
+					player->setPositionY(player->getPositionY() + offsetY);
+				}
+				else
+				{
+					player->setPositionX(player->getPositionX() + offsetX);
+				}
+			}
+			break;
+		case CustomTile::DOORNIGHT:
+			if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+			{
+				map.initialise(10, 10, currentLevel++);
+				for (int i = 0; i < map.tiles.size(); i++)
+				{
+					this->addChild(map.tiles.at(i)->m_CustomTileSprite);
+				}
+				for (int i = 0; i < map.tiles.size(); i++)
+				{
+					map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
+				}
+				if (currentLevel > 5)
+				{
+					activateGameWonScene(this);
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event)
@@ -211,6 +250,13 @@ void GameScene::activatePauseScene(Ref *pSender)
 void GameScene::activateGameOverScene(Ref *pSender)
 {
 	auto scene = GameOver::createScene();
+	Director::getInstance()->replaceScene(scene);
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
+}
+
+void GameScene::activateGameWonScene(Ref *pSender)
+{
+	auto scene = GameWon::createScene();
 	Director::getInstance()->replaceScene(scene);
 	CocosDenshion::SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
 }

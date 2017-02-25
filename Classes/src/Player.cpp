@@ -97,14 +97,9 @@ void Player::update(GameScene* world)
 	counter++;
 }
 
-void Player::loseLives(){
-	lives--;
-}
-
 void Player::idle()
 {
 	moving = false;
-	return moving;
 }
 
 void Player::initPlayer(){

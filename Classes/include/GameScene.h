@@ -3,6 +3,7 @@
 #include "cocos2d.h"
 #include "PauseScene.h"
 #include "GameOverScene.h"
+#include "GameWonScene.h"
 #include "GameData.h"
 #include "GameStates.h"
 #include "CollisionManager.h"
@@ -47,6 +48,8 @@ public:
 	void activatePauseScene(Ref *pSender);
 	// Called at game over 
 	void activateGameOverScene(Ref *pSender);
+	//calls game won
+	void activateGameWonScene(Ref *pSender);
 	//void createTowerBases();
 	void update(float dt);
 	//void scrollBk();
