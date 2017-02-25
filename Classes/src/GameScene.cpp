@@ -100,6 +100,7 @@ void GameScene::update(float dt)
 {
 	player->update(this);
 	boss->update(this);
+	willpower->update(this);
 
 	//allows the enemy reaper to follow the player
 	float x = player->getPosition().x - boss->getPosition().x;
@@ -165,7 +166,7 @@ void GameScene::update(float dt)
 				}
 				if (currentLevel > 5)
 				{
-					activateGameOverScene(this);
+					activateGameWonScene(this);
 				}
 			}
 			break;

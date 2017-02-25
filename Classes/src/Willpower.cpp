@@ -1,11 +1,9 @@
 #include "Willpower.h"
 
 USING_NS_CC;
-
+Willpower * willpower = new Willpower();
 Willpower * Willpower::create()
 {
-	Willpower * willpower = new Willpower();
-
 	if (willpower && willpower->initWithFile("GameScreen/willpower1.png", Rect(0, 0, 116.69, 112)))
 	{
 		//Create and run animation
@@ -21,11 +19,6 @@ Willpower * Willpower::create()
 		auto animate = CCAnimate::create(animation);
 		//make body for collisions
 		cocos2d::Size size(116.5, 112);
-		auto bossBody = PhysicsBody::createBox(size);
-		bossBody->setCollisionBitmask(0x000001);
-		bossBody->setContactTestBitmask(true);
-		bossBody->setTag(10);
-		willpower->setPhysicsBody(bossBody);
 		willpower->runAction(animate);
 		willpower->init();
 		willpower->setTag(10);
@@ -44,7 +37,7 @@ void Willpower::initWillpower(){
 
 }
 
-void Willpower::update()
+void Willpower::update(GameScene* world)
 {
 
 }

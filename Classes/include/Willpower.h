@@ -9,7 +9,7 @@ class Willpower : public cocos2d::Sprite{
 public:
 	static Willpower * create(void);
 	void initWillpower();
-	void update();
+	void update(GameScene* world);
 	bool getRemove();
 
 private:
