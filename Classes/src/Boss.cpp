@@ -2,10 +2,9 @@
 
 USING_NS_CC;
 
+Boss * boss = new Boss();
 Boss * Boss::create()
 {
-	Boss * boss = new Boss();
-
 	if (boss && boss->initWithFile("GameScreen/Reaper.png", Rect(0, 0, 69, 60)))
 	{
 		//Create and run animation
@@ -21,11 +20,9 @@ Boss * Boss::create()
 		auto animate = CCAnimate::create(animation);
 		//make body for collisions
 		cocos2d::Size size(69, 60);
-
 		boss->runAction(animate);
 		boss->initBullet();
 		boss->setTag(10);
-
 		return boss;
 	}
 	CC_SAFE_DELETE(boss);
@@ -48,7 +45,7 @@ bool Boss::getRemove(){
 }
 
 void Boss::initBullet(){
-	speed = 1.f;
+	speed = 0.5f;
 	dirX = dirY = 0;
 }
 
@@ -58,4 +55,10 @@ void Boss::update(GameScene* world)
 	setPositionX(getPosition().x + dirX * speed);
 	setPositionY(getPosition().y + dirY * speed);
 	setRotation(0);
+
+	if (dirX < 0) {
+		boss->_flippedX = true;
+	}
+	else
+		boss->_flippedX = false;
 }

@@ -29,15 +29,11 @@ bool PauseMenu::init()
 		MenuItemImage::create("PauseScreen/Resume_Button.png",
 		"PauseScreen/Resume_Button(Click).png",
 		CC_CALLBACK_1(PauseMenu::resume, this));
-	auto retryItem =
-		MenuItemImage::create("PauseScreen/Retry_Button.png",
-		"PauseScreen/Retry_Button(Click).png",
-		CC_CALLBACK_1(PauseMenu::retry, this));
 	auto mainMenuItem =
 		MenuItemImage::create("PauseScreen/Menu_Button.png",
 		"PauseScreen/Menu_Button(Click).png",
 		CC_CALLBACK_1(PauseMenu::activateMainMenuScene, this));
-	auto menu = Menu::create(resumeItem, retryItem, mainMenuItem,
+	auto menu = Menu::create(resumeItem, mainMenuItem,
 		NULL);
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -69,12 +65,4 @@ void PauseMenu::activateMainMenuScene(Ref *pSender)
 	Director::getInstance()->popScene();
 	Director::getInstance()->replaceScene(scene);
 	CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("MenuMusic.wav", true);
-}
-
-void PauseMenu::retry(Ref *pSender)
-{
-	auto scene = GameScene::createScene();
-	Director::getInstance()->popScene();
-	Director::getInstance()->replaceScene(scene);
-	CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("GameMusic.wav", true);
 }

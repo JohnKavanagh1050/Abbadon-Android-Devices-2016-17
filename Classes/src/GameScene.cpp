@@ -39,36 +39,47 @@ bool GameScene::init()
 	menu->setPosition(Point::ZERO);
 	this->addChild(menu, 6);
 
-	//scrolling background
-	//	bk1 = CCSprite::create("GameScreen/menuTemp.png");
-	//bk1->setAnchorPoint(ccp(0, 0));
-	//	bk1->setPosition(ccp(0, 0));
-
-	//	bk2 = CCSprite::create("GameScreen/Background.png");
-	//bk2->setAnchorPoint(ccp(0, 0));
-	//	bk2->setPosition(ccp(-bk1->boundingBox().size.width + 1, 0));
-
-	//this->addChild(bk1, 0);
-
 	collisionManager = std::make_shared<CollisionManager>(CollisionManager());
 
-	willpower = Willpower::create();
+	/*willpower = Willpower::create();
 	willpower->setPosition(Vec2(50, s.height - 50));
-	this->addChild(willpower, 5);
+	this->addChild(willpower, 5);*/
 
 	player = Player::create();
 	player->setPosition(Vec2(300, 300));
 	this->addChild(player, 5);
 
 	boss = Boss::create();
-	boss->setPosition(Vec2(300, 300));
+	boss->setPosition(Vec2(400, 600));
 	this->addChild(boss, 5);
 
 	this->scheduleUpdate();
+	comboLabel1 = Label::create("Willpower", "Arial", 40);
+	comboLabel2 = Label::create("12", "Arial", 40);
+
+	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+	comboLabel1->setPosition(100, winSize.height - comboLabel1->getContentSize().height / 2 - 50);
+	comboLabel2->setPosition(250, winSize.height - comboLabel1->getContentSize().height / 2 - 50);
+
+	// add this to the layer
+	this->addChild(comboLabel1, 6);
+	this->addChild(comboLabel2, 6);
 
 	auto contactListener = EventListenerPhysicsContact::create();
 	contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
+
+	map.initialise(10, 10, currentLevel);
+	map.ChangeLevel(true);
+	for (int i = 0; i < map.tiles.size(); i++)
+	{
+		this->addChild(map.tiles.at(i)->m_CustomTileSprite);
+	}
+	for (int i = 0; i < map.tiles.size(); i++)
+	{
+		map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
+	}
+	m_gameState = GameStates::GameDay;
 
 	return true;
 }
@@ -76,7 +87,6 @@ bool GameScene::init()
 void GameScene::addBackGroundSprite(cocos2d::Size const & visibleSize, cocos2d::Point const & origin)
 {
 	std::shared_ptr<GameData> ptr = GameData::sharedGameData();
-
 	auto backgroundSprite = Sprite::create
 	(ptr->m_backgroundTextureFile);
 	backgroundSprite->setPosition(Point((visibleSize.width / 2) +
@@ -86,7 +96,83 @@ void GameScene::addBackGroundSprite(cocos2d::Size const & visibleSize, cocos2d::
 
 void GameScene::update(float dt)
 {
-	player->update(this);
+	if (moving)
+	{
+		timerMoving -= 3;
+	}
+	if (notMoving)
+	{
+		timerMoving++;
+	}
+	if (cantMove)
+	{
+		cantMoveTimer++;
+		if (cantMoveTimer >= 200)
+		{
+			cantMove = false;
+		}
+	}
+	if (timerMoving > 1200)
+	{
+		timerMoving = 1200;
+	}
+	//updating willpower HUD
+	if (timerMoving <= 0) {
+		comboLabel2->setString("0");
+		cantMove = true;
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 100 && timerMoving >= 0) {
+		comboLabel2->setString("1");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 200 && timerMoving >= 100) {
+		comboLabel2->setString("2");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 300 && timerMoving >= 200) {
+		comboLabel2->setString("3");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 400 && timerMoving >= 300) {
+		comboLabel2->setString("4");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 500 && timerMoving >= 400) {
+		comboLabel2->setString("5");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 600 && timerMoving >= 500) {
+		comboLabel2->setString("6");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 700 && timerMoving >= 600) {
+		comboLabel2->setString("7");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 800 && timerMoving >= 700) {
+		comboLabel2->setString("8");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 900 && timerMoving >= 800) {
+		comboLabel2->setString("9");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 1000 && timerMoving >= 900) {
+		comboLabel2->setString("10");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 1100 && timerMoving >= 1000) {
+		comboLabel2->setString("11");
+	}
+	//updating willpower HUD
+	else if (timerMoving <= 1200 && timerMoving >= 1100) {
+		comboLabel2->setString("12");
+	}
+	//when will power is 0 you cannot move for a shrt period of time
+	if (!cantMove){
+		player->update(this);
+	}
 	boss->update(this);
 
 	//allows the enemy reaper to follow the player
@@ -98,59 +184,121 @@ void GameScene::update(float dt)
 
 	boss->move(x, y);
 
-	switch (m_gameState)
+	//collision between boss and player
+	if (collisionManager->checkCollision(player->getBoundingBox(), boss->getBoundingBox()))
 	{
-	case GameStates::GameInit:
-		map.initialise(10, 10, currentLevel++);
+		activateGameOverScene(this);
+	}
 
-		for (int i = 0; i < map.tiles.size(); i++)
+	if (player->getMoving() == false)
+	{
+		if (map.isDayTime != false)
 		{
-			this->addChild(map.tiles.at(i)->m_CustomTileSprite);
-		}
-		for (int i = 0; i < map.tiles.size(); i++)
-		{
-			map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
-		}
-		m_gameState = GameStates::GameDay;
-		break;
-	case GameStates::GameDay:
-		for (int i = 0; i < map.tiles.size(); i++)
-		{
-			switch (map.tiles.at(i)->tileType)
-			{
-			case CustomTile::WALL:
-				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
-				{
-					float offsetX = 0;
-					float offsetY = 0;
-					offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
-					offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
-
-					if (abs(offsetX) > abs(offsetY))
-					{
-						player->setPositionY(player->getPositionY() + offsetY);
-					}
-					else
-					{
-						player->setPositionX(player->getPositionX() + offsetX);
-					}
-				}
-				break;
-			case CustomTile::DOOR:
-				if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
-				{
-					m_gameState = GameStates::GameInit;
-				}
-				break;
-			default:
-				break;
-			}
+			map.ChangeLevel(true);
 		}
 	}
+	else
+	{
+		if (map.isDayTime == false)
+		{
+			map.ChangeLevel(false);
+		}
+	}
+	for (int i = 0; i < map.tiles.size(); i++)
+	{
+		switch (map.tiles.at(i)->tileType)
+		{
+		case CustomTile::WALL:
+			if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+			{
+				float offsetX = 0;
+				float offsetY = 0;
+				offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+				offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+
+				if (abs(offsetX) > abs(offsetY))
+				{
+					player->setPositionY(player->getPositionY() + offsetY);
+				}
+				else
+				{
+					player->setPositionX(player->getPositionX() + offsetX);
+				}
+			}
+			break;
+		case CustomTile::DOOR:
+			if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+			{
+				map.initialise(10, 10, currentLevel++);
+				for (int i = 0; i < map.tiles.size(); i++)
+				{
+					this->addChild(map.tiles.at(i)->m_CustomTileSprite);
+				}
+				for (int i = 0; i < map.tiles.size(); i++)
+				{
+					map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
+				}
+				if (currentLevel > 5)
+				{
+					activateGameWonScene(this);
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	for (int i = 0; i < map.tiles.size(); i++)
+	{
+		switch (map.tiles.at(i)->tileType)
+		{
+		case CustomTile::WALLNIGHT:
+			if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+			{
+				float offsetX = 0;
+				float offsetY = 0;
+				offsetX = collisionManager->getHorizontalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+				offsetY = collisionManager->getVerticalIntersectionDepth(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox());
+
+				if (abs(offsetX) > abs(offsetY))
+				{
+					player->setPositionY(player->getPositionY() + offsetY);
+				}
+				else
+				{
+					player->setPositionX(player->getPositionX() + offsetX);
+				}
+			}
+			break;
+		case CustomTile::DOORNIGHT:
+			if (collisionManager->checkCollision(player->getBoundingBox(), map.tiles.at(i)->m_CustomTileSprite->getBoundingBox()))
+			{
+				map.initialise(10, 10, currentLevel++);
+				for (int i = 0; i < map.tiles.size(); i++)
+				{
+					this->addChild(map.tiles.at(i)->m_CustomTileSprite);
+				}
+				for (int i = 0; i < map.tiles.size(); i++)
+				{
+					map.tiles.at(i)->m_CustomTileSprite->setVisible(true);
+				}
+				if (currentLevel > 5)
+				{
+					activateGameWonScene(this);
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	
 }
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event)
 {
+	moving = true;
+	notMoving = false;
 	//get location of my touch event for player movement
 	float x = touch->getLocation().x - player->getPosition().x;
 	float y = touch->getLocation().y - player->getPosition().y;
@@ -159,12 +307,15 @@ bool GameScene::onTouchBegan(Touch *touch, Event *event)
 	y /= magnitude;
 
 	player->move(x, y);
+	player->movingTrue();
 
 	return true;
 }
 
 void GameScene::onTouchEnded(Touch *touch, Event *event)
 {
+	moving = false;
+	notMoving = true;
 	player->idle();
 }
 
@@ -179,6 +330,13 @@ void GameScene::activatePauseScene(Ref *pSender)
 void GameScene::activateGameOverScene(Ref *pSender)
 {
 	auto scene = GameOver::createScene();
+	Director::getInstance()->replaceScene(scene);
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
+}
+
+void GameScene::activateGameWonScene(Ref *pSender)
+{
+	auto scene = GameWon::createScene();
 	Director::getInstance()->replaceScene(scene);
 	CocosDenshion::SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
 }

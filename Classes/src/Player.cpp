@@ -23,6 +23,7 @@ Player * Player::create()
 		player->runAction(animate);
 		player->initPlayer();
 		player->setTag(20);
+		player->moving = false;
 		return player;
 	}
 	CC_SAFE_DELETE(player);
@@ -44,14 +45,21 @@ float Player::setLives(){
 	lives = 10;
 	return lives;
 }
+bool Player::movingTrue(){
+	moving = true;
+	return moving;
+}
 
+bool Player::getMoving(){
+	return moving;
+}
 bool Player::stopSpeed() {
 	speed = 0;
 	return speed;
 }
 
 bool Player::giveSpeed() {
-	speed = 5.f;
+	speed = 3.f;
 	return speed;
 }
 
@@ -87,10 +95,6 @@ void Player::update(GameScene* world)
 
 	setRotation(0);
 	counter++;
-}
-
-void Player::loseLives(){
-	lives--;
 }
 
 void Player::idle()

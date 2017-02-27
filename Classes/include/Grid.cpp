@@ -12,6 +12,7 @@ void Grid::update()
 		tiles.at(i)->update();
 	}
 }
+
 void Grid::initialise(int width, int height, int loadLevel)
 {
 	/* LEVEL TILES
@@ -25,8 +26,8 @@ void Grid::initialise(int width, int height, int loadLevel)
 	tiles.clear();
 	m_width = width;
 	m_height = height;
-	cocos2d::Vec2 offset = cocos2d::Vec2(200, 400);
-	int currentLevel[10][10];
+	offset = cocos2d::Vec2(200, 400);
+	currentLevel[10][10];
 	switch (loadLevel)
 	{
 	case 1:
@@ -161,23 +162,53 @@ void Grid::initialise(int width, int height, int loadLevel)
 			case 2:
 				tempTile.setType(CustomTile::DOOR);
 				break;
-			case 3:
-				tempTile.setType(CustomTile::FLOORNIGHT);
-				break;
-			case 4:
-				tempTile.setType(CustomTile::WALLNIGHT);
-				break;
-			case 5:
-				tempTile.setType(CustomTile::DOORNIGHT);
-				break;
 			default:
 				break;
 			}
-
 			tempTile.updatePosition(cocos2d::Vec2(offset.x + y * 64, 1080 - (offset.y + x * 64)));
 			tiles.push_back(std::make_shared<CustomTile>(tempTile));
 		}
 	}
-
-
+}
+void Grid::ChangeLevel(bool isDayTime)
+{
+	for (int x = 0; x < 10; x++)
+	{
+		for (int y = 0; y < 10; y++)
+		{//set tiles into grid
+			CustomTile tempTile(cocos2d::Vec2(0 * 64, 0 * 64), 64);
+			if (isDayTime)
+			{
+				switch (currentLevel[x][y])
+				{
+				case 0:
+					tempTile.setType(CustomTile::FLOOR);
+					break;
+				case 1:
+					tempTile.setType(CustomTile::WALL);
+					break;
+				case 2:
+					tempTile.setType(CustomTile::DOOR);
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
+				switch (currentLevel[x][y])
+				{
+				case 0:
+					tempTile.setType(CustomTile::FLOORNIGHT);
+					break;
+				case 1:
+					tempTile.setType(CustomTile::WALLNIGHT);
+					break;
+				case 2:
+					tempTile.setType(CustomTile::DOORNIGHT);
+					break;
+				}
+			}
+		}
+	}
 }

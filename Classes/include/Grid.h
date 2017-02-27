@@ -14,14 +14,14 @@ public:
 	void update();
 
 	std::vector<std::shared_ptr<CustomTile>> tiles;
-	//int level1[10][10];
-	//int level2[10][10];
-	//int level3[10][10];
-	//int level4[10][10];
-	//int level5[10][10];
 
+	bool isDayTime = true;
 	int m_width;
 	int m_height;
+
+	void ChangeLevel(bool isDayTime);
 private:
+	int currentLevel[10][10];
+	cocos2d::Vec2 offset;
 
 };
