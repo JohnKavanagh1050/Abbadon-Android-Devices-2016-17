@@ -17,12 +17,7 @@ Willpower * Willpower::create()
 		}
 		auto animation = CCAnimation::createWithSpriteFrames(animFrames, 0.25f, 100000);
 		auto animate = CCAnimate::create(animation);
-		//make body for collisions
-		cocos2d::Size size(116.5, 112);
 		willpower->runAction(animate);
-		willpower->init();
-		willpower->setTag(10);
-
 		return willpower;
 	}
 	CC_SAFE_DELETE(willpower);

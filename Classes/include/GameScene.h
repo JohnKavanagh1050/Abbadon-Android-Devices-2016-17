@@ -8,7 +8,6 @@
 #include "GameStates.h"
 #include "CollisionManager.h"
 #include "Grid.h"
-
 #include "SimpleAudioEngine.h"  
 
 #include <string>
@@ -26,13 +25,20 @@ private:
 	Boss* boss;
 	Willpower* willpower;
 
-	cocos2d::CCSprite* bk1;
-	cocos2d::CCSprite* bk2;
-
 	std::shared_ptr<CollisionManager> collisionManager;
 
+	//level vars
 	int currentLevel = 1;
 	int maxLevels = 5;
+
+	//HUD vars
+	int timerNotMoving = 0;
+	int timerMoving = 1200;
+	bool canMove = true;
+	bool cantMove = false;
+	cocos2d::Label *comboLabel1;
+	cocos2d::Label *comboLabel2;
+
 	Grid map;
 	GameStates m_gameState = GameStates::GameInit;
 
@@ -41,6 +47,8 @@ public:
 	void SetPhysicsWorld(cocos2d::PhysicsWorld* world) { sceneWorld = world; };
     static cocos2d::Scene* createScene();
     virtual bool init();
+
+	void updateScore(int score);
 
 	void addBackGroundSprite(cocos2d::Size const & visibleSize, cocos2d::Point const & origin);
     
@@ -58,7 +66,6 @@ public:
 	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);
 
 	bool onContactBegin(cocos2d::PhysicsContact &contact);
-
 
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);

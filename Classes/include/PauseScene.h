@@ -20,8 +20,6 @@ public:
 	void resume(Ref *pSender);
 	// Called when main menu is selected.
 	void activateMainMenuScene(Ref *pSender);
-	// Called when retry is selected.
-	void retry(Ref *pSender);
     
     // implement the "static create()" method manually
     CREATE_FUNC(PauseMenu);

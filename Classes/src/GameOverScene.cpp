@@ -62,6 +62,8 @@ void GameOver::activateGameScene(Ref *pSender)
 {
 	auto scene = GameScene::createScene();
 	Director::getInstance()->replaceScene(scene);
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->stopBackgroundMusic("MenuMusic.wav");
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("GameMusic.wav", true);
 }
 
 void GameOver::activatePauseScene(Ref *pSender)
@@ -76,4 +78,6 @@ void GameOver::activateMainMenuScene(Ref *pSender)
 	//auto scene = PauseMenu::createScene();
 	auto scene = MainMenu::createScene();
 	Director::getInstance()->pushScene(scene);
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->stopBackgroundMusic("GameMusic.wav");
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("MenuMusic.wav", true);
 }
